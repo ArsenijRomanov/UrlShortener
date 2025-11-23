@@ -1,0 +1,22 @@
+syntax = "proto3";
+
+option csharp_namespace = "WriteService.Grpc";
+
+package write_service;
+
+import "google/protobuf/timestamp.proto";
+
+service WriteService{
+  rpc GetShortUrl(WriteServiceRequest) returns (WriteServiceResponse);
+}
+
+message WriteServiceRequest{
+  string long_url = 1;
+  int64 ttl = 2;
+}
+
+message WriteServiceResponse{
+  string short_url = 1;
+  google.protobuf.Timestamp created_at = 2;
+  google.protobuf.Timestamp expires_at = 3; 
+}

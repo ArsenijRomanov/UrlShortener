@@ -1,0 +1,22 @@
+syntax = "proto3";
+
+option csharp_namespace = "ReadService.Grpc";
+
+package read_service;
+
+import "google/protobuf/timestamp.proto";
+
+service ReadService{
+  rpc GetShortUrl(ReadServiceRequest) returns (ReadServiceResponse);
+}
+
+message ReadServiceRequest{
+  string short_url = 1;
+}
+
+message ReadServiceResponse{
+  string long_url = 1;
+  google.protobuf.Timestamp created_at = 2;
+  google.protobuf.Timestamp expires_at = 3;
+  bool is_expired = 4; 
+}

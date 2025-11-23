@@ -9,6 +9,12 @@
     <ItemGroup>
         <Protobuf Include="Protos\short_code_generator.proto"
                   GrpcServices="None" />
+        <Protobuf Include="Protos/write_service.proto"
+                  GrpcServices="None" />
+        <ItemGroup>
+            <Protobuf Include="Protos/read_service.proto"
+                      GrpcServices="None" />
+        </ItemGroup>
     </ItemGroup>
 
 </Project>
