@@ -7,25 +7,23 @@
     </PropertyGroup>
 
     <ItemGroup>
-      <PackageReference Include="Grpc.AspNetCore" Version="2.71.0" />
-      <PackageReference Include="Grpc.Tools" Version="2.76.0">
-        <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
-        <PrivateAssets>all</PrivateAssets>
-      </PackageReference>
-      <PackageReference Include="SharpJuice.Essentials" Version="2.6.0" />
+        <PackageReference Include="Grpc.AspNetCore" Version="2.71.0" />
+        <PackageReference Include="Grpc.Tools" Version="2.76.0">
+            <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+            <PrivateAssets>all</PrivateAssets>
+        </PackageReference>
+        <PackageReference Include="SharpJuice.Essentials" Version="2.6.0" />
     </ItemGroup>
 
     <ItemGroup>
-      <ProjectReference Include="..\Contracts\Contracts.csproj" />
-      <ProjectReference Include="..\Shared.Infrastructure\Shared.Infrastructure.csproj" />
-        <Protobuf Include="/home/ars/RiderProjects/URLShorter/UrlShorter/Contracts/short_code_generator.proto" GrpcServices="Server" />
+        <ProjectReference Include="..\Contracts\Contracts.csproj" />
+        <ProjectReference Include="..\Shared.Infrastructure\Shared.Infrastructure.csproj" />
     </ItemGroup>
-
+    
     <ItemGroup>
-      <_ContentIncludedByDefault Remove="Contracts\bin\Debug\net9.0\Contracts.deps.json" />
-      <_ContentIncludedByDefault Remove="Contracts\obj\Contracts.csproj.nuget.dgspec.json" />
-      <_ContentIncludedByDefault Remove="Contracts\obj\project.assets.json" />
-      <_ContentIncludedByDefault Remove="Contracts\obj\project.packagespec.json" />
+        <Protobuf Include="..\Contracts\Protos\short_code_generator.proto"
+                  Link="Protos\short_code_generator.proto"
+                  GrpcServices="Server" />
     </ItemGroup>
 
 </Project>

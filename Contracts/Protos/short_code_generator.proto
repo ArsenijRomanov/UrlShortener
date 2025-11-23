@@ -5,7 +5,7 @@ option csharp_namespace = "Generator.Grpc";
 package short_code_generator;
 
 message GenerateShortCodeRequest{
-  string long_url = 1;
+  
 }
 
 message GenerateShortCodeResponse{
