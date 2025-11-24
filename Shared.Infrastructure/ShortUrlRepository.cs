@@ -1,5 +1,6 @@
 using Microsoft.EntityFrameworkCore;
 using UrlShortener.Shared.Domain;
+using UrlShortener.Shared.Domain.Repositories;
 
 namespace UrlShortener.Shared.Infrastructure;
 

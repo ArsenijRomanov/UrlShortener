@@ -1,4 +1,4 @@
-namespace UrlShortener.Shared.Domain;
+namespace UrlShortener.Shared.Domain.Repositories;
 
 public interface IShortUrlReadRepository
 {

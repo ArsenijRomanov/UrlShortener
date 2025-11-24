@@ -10,7 +10,7 @@ public class ShortUrlConfiguration: IEntityTypeConfiguration<ShortUrl>
     {
         shortUrl.ToTable("Short_Urls");
         shortUrl.HasKey(x => x.Id);
-        shortUrl.Property(x => x.Id).HasColumnName("id");
+        shortUrl.Property(x => x.Id).HasColumnName("id").ValueGeneratedOnAdd();;
         shortUrl.Property(x => x.LongUrl).HasColumnName("long_url").IsRequired();
         shortUrl.Property(x => x.ShortCode).HasColumnName("short_code").IsRequired();
         shortUrl.Property(x => x.CreatedAt).HasColumnName("created_at").IsRequired();

@@ -16,8 +16,21 @@
     </ItemGroup>
 
     <ItemGroup>
+      <ProjectReference Include="..\Generator\Generator.csproj" />
       <ProjectReference Include="..\Shared.Domain\Shared.Domain.csproj" />
       <ProjectReference Include="..\Shared.Infrastructure\Shared.Infrastructure.csproj" />
+    </ItemGroup>
+
+    <ItemGroup>
+        <Protobuf Include="..\Contracts\Protos\write_service.proto"
+                  Link="Protos\write_service.proto"
+                  GrpcServices="Server" />
+    </ItemGroup>
+
+    <ItemGroup>
+        <Protobuf Include="..\Contracts\Protos\short_code_generator.proto"
+                  Link="Protos\short_code_generator.proto"
+                  GrpcServices="Client" />
     </ItemGroup>
 
 </Project>
