@@ -9,12 +9,18 @@ public class ShortUrl
 
     public ShortUrl(
         string longUrl, 
-        string shortUrl, 
+        string shortCode, 
         DateTime createdAt, 
         DateTime? expiresAt = null)
     {
-        LongUrl = longUrl ?? throw new ArgumentNullException(nameof(longUrl));
-        ShortCode = shortUrl ?? throw new ArgumentNullException(nameof(shortUrl));
+        if (string.IsNullOrWhiteSpace(longUrl))
+            throw new ArgumentException("LongUrl must not be empty or whitespace", nameof(longUrl));
+
+        if (string.IsNullOrWhiteSpace(shortCode))
+            throw new ArgumentException("ShortCode must not be empty or whitespace", nameof(shortCode));
+
+        LongUrl = longUrl;
+        ShortCode = shortCode;
         CreatedAt = createdAt;
         ExpiresAt = expiresAt;
     }
