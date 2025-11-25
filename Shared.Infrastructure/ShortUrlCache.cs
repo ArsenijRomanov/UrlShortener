@@ -18,7 +18,7 @@ public class RedisShortUrlCache: IShortUrlCache
     {
         var longUrl = await _db.StringGetAsync(new RedisKey(BuildKey(shortCode)));
         if (!longUrl.HasValue) return null;
-        return longUrl.HasValue ? longUrl.ToString() : null;
+        return longUrl.ToString();
     }
 
     public async Task SetLongUrlAsync(string shortCode, string longUrl, TimeSpan ttl, CancellationToken ct = default)
