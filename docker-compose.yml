@@ -1,0 +1,87 @@
+version: '3.8'
+
+services:
+  redis:
+    image: redis:alpine
+    container_name: url-redis
+    ports:
+      - "6379:6379"
+    restart: unless-stopped
+
+  db-master:
+    image: postgres:15-alpine
+    container_name: postgres-master
+    environment:
+      POSTGRES_USER: user
+      POSTGRES_PASSWORD: simplepass
+      POSTGRES_DB: url_db
+    ports:
+      - "5432:5432"
+    volumes:
+      - db-master-data:/var/lib/postgresql/data
+      - ./init-master.sh:/docker-entrypoint-initdb.d/init-master.sh
+    command: postgres -c wal_level=replica -c max_wal_senders=10 -c max_replication_slots=10 -c hot_standby=on -c listen_addresses='*'
+    restart: unless-stopped
+
+  db-slave:
+    image: postgres:15-alpine
+    container_name: postgres-slave
+    depends_on:
+      - db-master
+    environment:
+      POSTGRES_USER: user
+      POSTGRES_PASSWORD: simplepass
+      POSTGRES_DB: url_db
+    ports:
+      - "5433:5432"
+    volumes:
+      - db-slave-data:/var/lib/postgresql/data
+      - ./init-slave.sh:/docker-entrypoint-initdb.d/init-slave.sh
+    command: postgres -c hot_standby=on
+    restart: on-failure
+
+  writeservice:
+    build:
+      context: .
+      dockerfile: WriteService/Dockerfile
+    container_name: url-writeservice
+    ports:
+      - "8082:8080"
+    depends_on:
+      - db-master
+      - redis
+    environment:
+      - ConnectionStrings:DefaultConnection=Host=db-master;Port=5432;Database=url_db;Username=user;Password=simplepass
+      - RedisCacheConnection=redis:6379
+      - SECRET_KEY=your_url_hashing_secret_key
+    restart: unless-stopped
+
+  readservice:
+    build:
+      context: .
+      dockerfile: ReadService/Dockerfile
+    container_name: url-readservice
+    ports:
+      - "8081:8080"
+    depends_on:
+      - db-slave
+      - redis
+    environment:
+      - ConnectionStrings:DefaultConnection=Host=db-slave;Port=5432;Database=url_db;Username=user;Password=simplepass
+      - RedisCacheConnection=redis:6379
+    restart: unless-stopped
+
+  generator:
+    build:
+      context: .
+      dockerfile: Generator/Dockerfile
+    container_name: url-generator
+    ports:
+      - "8083:8080"
+    depends_on:
+      - db-master
+    restart: unless-stopped
+
+volumes:
+  db-master-data:
+  db-slave-data:
