@@ -1,141 +1,126 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="ru">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>URL Shortener</title>
-    <link rel="stylesheet" href="style.css">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>URL Shortener</title>
+  <link rel="stylesheet" href="./style.css" />
 </head>
 <body>
-    <div class="container">
-        <header class="header">
-            <div class="logo">
-                <i class="fas fa-link"></i>
-                <h1>URL Shortener</h1>
+  <div class="page">
+    <header class="header">
+      <div class="brand">
+        <div class="logo">🔗</div>
+        <div>
+          <h1>URL Shortener</h1>
+        </div>
+      </div>
+    </header>
+
+    <main class="grid">
+      <!-- CREATE -->
+      <section class="card">
+        <h2>Создать короткую ссылку</h2>
+
+        <label class="label" for="longUrl">Long URL</label>
+        <input id="longUrl" class="input" placeholder="https://example.com/some/very/long/url" />
+
+        <div class="row two">
+          <div>
+            <label class="label" for="ttl">TTL (сек.)</label>
+            <input id="ttl" class="input" type="number" min="0" step="1" value="604800" />
+            <p class="hint">0 или пусто — “как решит бекенд”.</p>
+          </div>
+          <div class="actions">
+            <button class="btn primary" id="createBtn" type="button">Создать</button>
+            <button class="btn secondary" id="clearCreateBtn" type="button">Очистить</button>
+          </div>
+        </div>
+
+        <div id="createResult" class="result hidden">
+          <div class="result-head">
+            <div>
+              <div class="muted small">Short URL</div>
+              <a id="shortLink" href="#" target="_blank" rel="noreferrer"></a>
             </div>
-            <p class="tagline">Создавайте короткие ссылки за секунды</p>
-        </header>
+            <button class="btn secondary" id="copyBtn" type="button">Скопировать</button>
+          </div>
 
-        <main class="main-content">
-            <div class="card create-card">
-                <h2><i class="fas fa-plus-circle"></i> Создать короткую ссылку</h2>
-                
-                <div class="input-section">
-                    <div class="input-with-icon">
-                        <i class="fas fa-link input-icon"></i>
-                        <input 
-                            type="url" 
-                            id="urlInput" 
-                            placeholder="https://example.com"
-                            class="url-input"
-                        >
-                    </div>
-                    
-                    <button class="create-btn" onclick="createShortUrl()">
-                        <i class="fas fa-magic"></i> Сократить
-                    </button>
-                </div>
-
-                <div id="result" class="result-section hidden">
-                    <div class="success-header">
-                        <i class="fas fa-check-circle"></i>
-                        <h3>Ссылка создана!</h3>
-                    </div>
-                    
-                    <div class="result-box">
-                        <div class="result-item">
-                            <span class="result-label">Ваша короткая ссылка:</span>
-                            <div class="short-url-container">
-                                <a id="shortLink" target="_blank" class="short-url"></a>
-                                <button class="copy-btn" onclick="copyToClipboard()">
-                                    <i class="far fa-copy"></i> Копировать
-                                </button>
-                            </div>
-                        </div>
-                        
-                        <div class="meta-data">
-                            <div class="meta-item">
-                                <i class="fas fa-hashtag"></i>
-                                <span>Код: <strong id="urlCode"></strong></span>
-                            </div>
-                            <div class="meta-item">
-                                <i class="far fa-clock"></i>
-                                <span>Создана: <strong id="createdAt"></strong></span>
-                            </div>
-                            <div class="meta-item">
-                                <i class="fas fa-hourglass-end"></i>
-                                <span>Истекает: <strong id="expiresAt"></strong></span>
-                            </div>
-                        </div>
-                    </div>
-                </div>
+          <div class="meta">
+            <div class="meta-item">
+              <div class="muted small">Code</div>
+              <div id="code"></div>
             </div>
-
-            <div class="card lookup-card">
-                <h2><i class="fas fa-search"></i> Информация о короткой ссылке</h2>
-                
-                <div class="input-section">
-                    <div class="input-with-icon">
-                        <i class="fas fa-search input-icon"></i>
-                        <input 
-                            type="text" 
-                            id="lookupInput" 
-                            placeholder="Введите код или короткую ссылку"
-                            class="url-input"
-                        >
-                    </div>
-                    
-                    <button class="create-btn" onclick="lookupShortUrl()">
-                        <i class="fas fa-info-circle"></i> Показать данные
-                    </button>
-                </div>
-
-                <div id="lookupResult" class="lookup-result hidden">
-                    <div class="lookup-header">
-                        <i class="fas fa-info-circle"></i>
-                        <h3>Метаданные</h3>
-                    </div>
-                    
-                    <div class="result-box">
-                        <div class="meta-data">
-                            <div class="meta-item">
-                                <i class="fas fa-hashtag"></i>
-                                <span>Код: <strong id="lookupCode"></strong></span>
-                            </div>
-                            <div class="meta-item">
-                                <i class="far fa-clock"></i>
-                                <span>Создана: <strong id="lookupCreatedAt"></strong></span>
-                            </div>
-                            <div class="meta-item">
-                                <i class="fas fa-hourglass-end"></i>
-                                <span>Истекает: <strong id="lookupExpiresAt"></strong></span>
-                            </div>
-                            <div class="meta-item">
-                                <i class="fas fa-link"></i>
-                                <span>Статус: <strong id="lookupStatus"></strong></span>
-                            </div>
-                        </div>
-                    </div>
-                </div>
+            <div class="meta-item">
+              <div class="muted small">CreatedAt</div>
+              <div id="createdAt"></div>
             </div>
-
-            <div class="card history-card">
-                <h2><i class="fas fa-history"></i> История ссылок</h2>
-                <div id="historyList" class="history-list">
-                    <div class="empty-history">
-                        <i class="far fa-file-alt"></i>
-                        <p>Создайте первую ссылку</p>
-                    </div>
-                </div>
+            <div class="meta-item">
+              <div class="muted small">ExpiresAt</div>
+              <div id="expiresAt"></div>
             </div>
-        </main>
+          </div>
 
-        <footer class="footer">
-            <p>URL Shortener Project &copy; 2025</p>
-        </footer>
-    </div>
+          <details class="details">
+            <summary>Показать Long URL</summary>
+            <div id="longUrlOut" class="mono"></div>
+          </details>
+        </div>
 
-    <script src="script.js"></script>
+        <div id="createError" class="alert hidden"></div>
+      </section>
+
+      <!-- LOOKUP META -->
+      <section class="card">
+        <h2>Получить метаданные</h2>
+
+        <label class="label" for="codeOrUrl">Код или короткая ссылка</label>
+        <input id="codeOrUrl" class="input" placeholder="aZ3f9Q или http://localhost:8080/api/shortUrls/aZ3f9Q" />
+
+        <div class="actions">
+          <button class="btn primary" id="lookupBtn" type="button">Найти</button>
+          <button class="btn secondary" id="clearLookupBtn" type="button">Очистить</button>
+        </div>
+
+        <div id="lookupResult" class="result hidden">
+          <div class="meta">
+            <div class="meta-item">
+              <div class="muted small">Code</div>
+              <div id="lookupCode"></div>
+            </div>
+            <div class="meta-item">
+              <div class="muted small">CreatedAt</div>
+              <div id="lookupCreatedAt"></div>
+            </div>
+            <div class="meta-item">
+              <div class="muted small">ExpiresAt</div>
+              <div id="lookupExpiresAt"></div>
+            </div>
+            <div class="meta-item">
+              <div class="muted small">Status</div>
+              <div id="lookupStatus"></div>
+            </div>
+          </div>
+        </div>
+
+        <div id="lookupError" class="alert hidden"></div>
+      </section>
+
+      <!-- HISTORY -->
+      <section class="card full">
+        <div class="row space-between">
+          <h2>История (локально)</h2>
+          <button class="btn danger" id="clearHistoryBtn" type="button">Очистить историю</button>
+        </div>
+
+        <div id="history" class="history"></div>
+        <p class="hint">Хранится в localStorage (последние 10).</p>
+      </section>
+    </main>
+  </div>
+
+  <div id="toast" class="toast hidden"></div>
+
+  <script src="./script.js"></script>
 </body>
 </html>
