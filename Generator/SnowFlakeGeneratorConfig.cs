@@ -8,11 +8,11 @@ public class SnowFlakeGeneratorConfig
     public const byte MillisBits = 41;
     public const byte InstanceBits  = 10;
     public const byte SequenceBits  = 12;
-    public ushort InstanceId { get; init; }
+    public ushort InstanceId { get; }
 
     public SnowFlakeGeneratorConfig(ushort instanceId)
     {
-        if (instanceId > (1 << InstanceBits) - 1 || instanceId < 0) throw new ArgumentOutOfRangeException(nameof(instanceId));
+        if (instanceId is > (1 << InstanceBits) - 1 or < 0) throw new ArgumentOutOfRangeException(nameof(instanceId));
         InstanceId = instanceId;
     }
 }

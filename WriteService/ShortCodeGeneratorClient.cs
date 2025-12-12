@@ -23,14 +23,12 @@ public class ShortCodeGeneratorClient: IShortCodeGenerator
             var shortCode = await _client.GenerateShortCodeAsync(
                 new GenerateShortCodeRequest(), 
                 cancellationToken: ct);
-            
-            if (string.IsNullOrWhiteSpace(shortCode.ShortCode))
-            {
-                _logger.LogError("Generator returned empty short code");
-                throw new InvalidOperationException("Generator returned empty short code");
-            }
 
-            return shortCode.ShortCode;
+            if (!string.IsNullOrWhiteSpace(shortCode.ShortCode)) return shortCode.ShortCode;
+            
+            _logger.LogError("Generator returned empty short code");
+            throw new InvalidOperationException("Generator returned empty short code");
+
         }
         catch (RpcException ex)
         {
