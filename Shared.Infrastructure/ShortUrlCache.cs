@@ -1,28 +1,28 @@
+using System.Text.Json;
 using StackExchange.Redis;
 
 namespace Shared.Infrastructure;
 
-
-public class RedisShortUrlCache: IShortUrlCache
+public class RedisShortUrlCache(IConnectionMultiplexer connection) : IShortUrlCache
 {
-    private readonly IDatabase _db;
+    private readonly IDatabase _db = connection.GetDatabase();
 
-    public RedisShortUrlCache(IConnectionMultiplexer connection)
+    private static string BuildKey(string shortCode) => $"short_url:{shortCode}";
+
+    public async Task<CachedShortUrl?> GetAsync(string shortCode, CancellationToken ct = default)
     {
-        _db = connection.GetDatabase();
+        var value = await _db.StringGetAsync(BuildKey(shortCode));
+        
+        return !value.HasValue ? null : JsonSerializer.Deserialize<CachedShortUrl>(value.ToString());
     }
 
-    private string BuildKey(string shortCode) => $"shortCode: {shortCode}";
-    
-    public async Task<string?> GetLongUrlAsync(string shortCode, CancellationToken ct = default)
+    public async Task SetAsync(string shortCode, CachedShortUrl model, TimeSpan ttl, CancellationToken ct = default)
     {
-        var longUrl = await _db.StringGetAsync(new RedisKey(BuildKey(shortCode)));
-        if (!longUrl.HasValue) return null;
-        return longUrl.ToString();
-    }
+        var json = JsonSerializer.Serialize(model);
 
-    public async Task SetLongUrlAsync(string shortCode, string longUrl, TimeSpan ttl, CancellationToken ct = default)
-    {
-        await _db.StringSetAsync(BuildKey(shortCode), longUrl, ttl);
+        await _db.StringSetAsync(
+            key: BuildKey(shortCode), 
+            value: json, 
+            expiry: ttl);
     }
 }

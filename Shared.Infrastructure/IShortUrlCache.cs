@@ -1,14 +1,10 @@
 namespace Shared.Infrastructure;
 
+public record CachedShortUrl(string LongUrl, DateTime CreatedAt, DateTime? ExpiresAt);
+
 public interface IShortUrlCache
 {
-    Task<string?> GetLongUrlAsync(
-        string shortCode, 
-        CancellationToken ct = default);
+    Task<CachedShortUrl?> GetAsync(string shortCode, CancellationToken ct = default);
     
-    Task SetLongUrlAsync(
-        string shortCode, 
-        string longUrl, 
-        TimeSpan ttl, 
-        CancellationToken ct = default);
+    Task SetAsync(string shortCode, CachedShortUrl model, TimeSpan ttl, CancellationToken ct = default);
 }
