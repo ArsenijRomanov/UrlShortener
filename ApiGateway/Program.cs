@@ -93,7 +93,7 @@ app.MapPost("/api/shortUrls", async (
 
     var shortBase = config["ShortUrlBase"]!.TrimEnd('/');
     var code = grpcResponse.ShortUrl;
-    var shortUrl = $"{shortBase}/{code}";
+    var shortUrl = $"{shortBase}/api/shortUrl/{code}";
 
     var httpResponse = new CreateShortUrlHttpResponse(
         Code: code,
