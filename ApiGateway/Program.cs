@@ -140,17 +140,8 @@ static async Task<IResult> HandleRedirectAsync(
     return Results.Redirect(grpcResponse.LongUrl, permanent: false);
 }
 
-// ------------ GET /{code} ------------
-// Пользовательский путь: короткая ссылка вида https://short.my/{code}
-
-app.MapGet("/{code}", (
-    string code,
-    ReadService.Grpc.ReadService.ReadServiceClient readClient) =>
-    HandleRedirectAsync(code, readClient)
-);
-
 // ------------ GET /api/shortUrls/{code} ------------
-// API-эндпоинт редиректа, чтобы совпадать с описанием в tr.md
+// API-эндпоинт редиректа
 
 app.MapGet("/api/shortUrls/{code}", (
     string code,
