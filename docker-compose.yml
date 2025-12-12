@@ -67,7 +67,7 @@ services:
       - redis
     environment:
       - ConnectionStrings__ReadDb=Host=db-slave;Port=5432;Database=url_db;Username=user;Password=simplepass
-      - RedisCacheConnection=redis:6379
+      - ConnectionStrings__Redis=redis:6379
     restart: unless-stopped
 
   generator:
