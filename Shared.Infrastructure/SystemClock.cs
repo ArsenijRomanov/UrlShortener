@@ -4,5 +4,5 @@ using SharpJuice.Essentials;
 
 public class SystemClock: IClock
 {
-    public DateTimeOffset Now { get; } = DateTimeOffset.UtcNow;
+    public DateTimeOffset Now => DateTimeOffset.UtcNow;
 }
