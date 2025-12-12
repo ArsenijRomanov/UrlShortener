@@ -1,3 +1,4 @@
+using Microsoft.AspNetCore.Server.Kestrel.Core;
 using Microsoft.EntityFrameworkCore;
 using ReadService;
 using SharpJuice.Essentials;
@@ -5,6 +6,14 @@ using UrlShortener.Shared.Domain.Repositories;
 using UrlShortener.Shared.Infrastructure;
 
 var builder = WebApplication.CreateBuilder(args);
+
+builder.WebHost.ConfigureKestrel(options =>
+{
+    options.ListenAnyIP(8080, o =>
+    {
+        o.Protocols = HttpProtocols.Http2;
+    });
+});
 
 builder.Services.AddGrpc();
 

@@ -1,5 +1,3 @@
-version: '3.8'
-
 services:
   redis:
     image: redis:alpine
@@ -51,7 +49,8 @@ services:
       - db-master
       - redis
     environment:
-      - ConnectionStrings:DefaultConnection=Host=db-master;Port=5432;Database=url_db;Username=user;Password=simplepass
+      - ConnectionStrings__WriteDb=Host=db-master;Port=5432;Database=url_db;Username=user;Password=simplepass
+      - ConnectionStrings__Generator=http://generator:8080
       - RedisCacheConnection=redis:6379
       - SECRET_KEY=your_url_hashing_secret_key
     restart: unless-stopped
@@ -67,7 +66,7 @@ services:
       - db-slave
       - redis
     environment:
-      - ConnectionStrings:DefaultConnection=Host=db-slave;Port=5432;Database=url_db;Username=user;Password=simplepass
+      - ConnectionStrings__ReadDb=Host=db-slave;Port=5432;Database=url_db;Username=user;Password=simplepass
       - RedisCacheConnection=redis:6379
     restart: unless-stopped
 
@@ -80,6 +79,33 @@ services:
       - "8083:8080"
     depends_on:
       - db-master
+    restart: unless-stopped
+
+  apigateway:
+    build:
+      context: .
+      dockerfile: ApiGateway/Dockerfile
+    container_name: url-apigateway
+    ports:
+      - "8080:8080"              # снаружи:8080 -> внутри:8080 (Kestrel в ApiGateway)
+    depends_on:
+      - writeservice
+      - readservice
+    environment:
+      # Kestrel слушает на 8080 во всех интерфейсах
+      - ASPNETCORE_URLS=http://+:8080
+      - ASPNETCORE_ENVIRONMENT=Development
+      # База коротких ссылок, которая попадёт в ShortUrlBase (используется при формировании shortUrl в ответе)
+      # Для локальной разработки логично указывать URL самого gateway:
+      - ShortUrlBase=http://localhost:8080
+
+      # gRPC адреса для WriteService и ReadService
+      # В коде используются ключи конфигурации "Grpc:WriteService" и "Grpc:ReadService",
+      # поэтому в env их задаём как Grpc:WriteService и Grpc:ReadService.
+      # Внутри docker-сети сервисы доступны по своим именам: writeservice, readservice.
+      - Grpc:WriteService=http://writeservice:8080
+      - Grpc:ReadService=http://readservice:8080
+
     restart: unless-stopped
 
 volumes:

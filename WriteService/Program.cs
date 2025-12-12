@@ -1,4 +1,5 @@
 using Generator.Grpc;
+using Microsoft.AspNetCore.Server.Kestrel.Core;
 using Microsoft.EntityFrameworkCore;
 using UrlShortener.Shared.Infrastructure;
 using SharpJuice.Essentials;
@@ -6,6 +7,14 @@ using UrlShortener.Shared.Domain.Repositories;
 using WriteService;
 
 var builder = WebApplication.CreateBuilder(args);
+
+builder.WebHost.ConfigureKestrel(options =>
+{
+    options.ListenAnyIP(8080, o =>
+    {
+        o.Protocols = HttpProtocols.Http2;
+    });
+});
 
 builder.Services.AddGrpc();
 
@@ -31,6 +40,12 @@ builder.Services.AddGrpcClient<ShortCodeGeneratorService.ShortCodeGeneratorServi
 });
 
 var app = builder.Build();
+
+using (var scope = app.Services.CreateScope())
+{
+    var db = scope.ServiceProvider.GetRequiredService<ShortUrlDbContext>();
+    await db.Database.EnsureCreatedAsync();
+}
 
 app.MapGrpcService<WriteServiceGrpc>();
 
