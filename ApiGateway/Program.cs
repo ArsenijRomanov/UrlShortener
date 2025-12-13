@@ -23,7 +23,19 @@ builder.Services.AddGrpcClient<ReadService.Grpc.ReadService.ReadServiceClient>(o
     o.Address = new Uri(readServiceAddress);
 });
 
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("dev", policy =>
+        policy
+            .SetIsOriginAllowed(_ => true)
+            .AllowAnyHeader()
+            .AllowAnyMethod()
+    );
+});
+
 var app = builder.Build();
+
+app.UseCors("dev");
 
 if (app.Environment.IsDevelopment())
 {
