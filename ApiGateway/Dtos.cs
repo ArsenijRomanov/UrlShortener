@@ -1,4 +1,4 @@
-namespace ApiGateway; 
+namespace ApiGateway;
 
 public record CreateShortUrlHttpRequest(string LongUrl, long? Ttl);
 
@@ -8,12 +8,12 @@ public record CreateShortUrlHttpResponse(
     string LongUrl,
     long? Ttl,
     DateTime CreatedAt,
-    DateTime ExpiresAt
+    DateTime? ExpiresAt
 );
 
 public record ShortUrlMetaHttpResponse(
     string Code,
     string LongUrl,
     DateTime CreatedAt,
-    DateTime ExpiresAt
+    DateTime? ExpiresAt
 );
