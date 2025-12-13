@@ -5,10 +5,8 @@ using WriteService.Grpc;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// База коротких ссылок (используется при формировании shortUrl в ответе)
 builder.Configuration["ShortUrlBase"] ??= "https://short.my";
 
-// Адреса gRPC-сервисов
 var writeServiceAddress = builder.Configuration["Grpc:WriteService"] ?? "http://localhost:6001";
 var readServiceAddress  = builder.Configuration["Grpc:ReadService"]  ?? "http://localhost:6002";
 
@@ -33,18 +31,12 @@ if (app.Environment.IsDevelopment())
     app.UseSwaggerUI();
 }
 
-// ------------ вспомогательные методы ------------
-
 static bool IsValidShortCode(string? code)
 {
-    // Базовая техническая валидация идентификатора:
-    // - непустой
-    // Остальные проверки (алфавит base62, длина и т.п.) считаем доменной логикой ReadService.
     return !string.IsNullOrWhiteSpace(code);
 }
 
 // ------------ POST /api/shortUrls ------------
-// Создание короткой ссылки по Long URL
 
 app.MapPost("/api/shortUrls", async (
     HttpRequest httpRequest,
@@ -52,25 +44,18 @@ app.MapPost("/api/shortUrls", async (
     WriteService.Grpc.WriteService.WriteServiceClient writeClient,
     IConfiguration config) =>
 {
-    // 1. Техническая проверка Content-Type
     if (httpRequest.ContentType is null ||
         !httpRequest.ContentType.StartsWith("application/json", StringComparison.OrdinalIgnoreCase))
     {
         return Results.BadRequest(new { error = "Content-Type must be application/json" });
     }
-
-    // 2. Техническая проверка: тело пришло и было распарсено как JSON
+    
     if (request is null)
         return Results.BadRequest(new { error = "Request body is required" });
 
-    // 3. Техническая проверка: обязательное поле longUrl присутствует и не пустое
-    // (без проверки формата/схемы – это уже доменная валидация, которая должна быть в WriteService)
     if (string.IsNullOrWhiteSpace(request.LongUrl))
         return Results.BadRequest(new { error = "longUrl is required" });
-
-    // Типы полей (string для longUrl, int64 для ttl) обеспечивает модель-биндинг/JSON десериализация.
-    // Никаких проверок Uri и диапазонов TTL тут не делаем – это задача WriteService.
-
+    
     var grpcRequest = new WriteServiceRequest
     {
         LongUrl = request.LongUrl,
@@ -84,7 +69,6 @@ app.MapPost("/api/shortUrls", async (
     }
     catch (Exception)
     {
-        // Доменные/технические ошибки write-сервиса мы проксируем как 502
         return Results.StatusCode(StatusCodes.Status502BadGateway);
     }
 
@@ -107,7 +91,6 @@ app.MapPost("/api/shortUrls", async (
     return Results.Created(shortUrl, httpResponse);
 });
 
-// Общий handler для редиректа, чтобы переиспользовать его на разных маршрутах
 static async Task<IResult> HandleRedirectAsync(
     string code,
     ReadService.Grpc.ReadService.ReadServiceClient readClient)
@@ -135,13 +118,11 @@ static async Task<IResult> HandleRedirectAsync(
 
     if (grpcResponse.IsExpired)
         return Results.StatusCode(StatusCodes.Status410Gone);
-
-    // 302 Found (temporary) – соответствует тех.решению
+    
     return Results.Redirect(grpcResponse.LongUrl, permanent: false);
 }
 
 // ------------ GET /api/shortUrls/{code} ------------
-// API-эндпоинт редиректа
 
 app.MapGet("/api/shortUrls/{code}", (
     string code,
@@ -150,7 +131,6 @@ app.MapGet("/api/shortUrls/{code}", (
 );
 
 // ------------ GET /api/shortUrls/{code}/meta ------------
-// Получение метаданных по Short URL
 
 app.MapGet("/api/shortUrls/{code}/meta", async (
     string code,

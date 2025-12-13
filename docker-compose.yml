@@ -87,22 +87,13 @@ services:
       dockerfile: ApiGateway/Dockerfile
     container_name: url-apigateway
     ports:
-      - "8080:8080"              # снаружи:8080 -> внутри:8080 (Kestrel в ApiGateway)
+      - "8080:8080"
     depends_on:
       - writeservice
       - readservice
-    environment:
-      # Kestrel слушает на 8080 во всех интерфейсах
       - ASPNETCORE_URLS=http://+:8080
       - ASPNETCORE_ENVIRONMENT=Development
-      # База коротких ссылок, которая попадёт в ShortUrlBase (используется при формировании shortUrl в ответе)
-      # Для локальной разработки логично указывать URL самого gateway:
       - ShortUrlBase=http://localhost:8080
-
-      # gRPC адреса для WriteService и ReadService
-      # В коде используются ключи конфигурации "Grpc:WriteService" и "Grpc:ReadService",
-      # поэтому в env их задаём как Grpc:WriteService и Grpc:ReadService.
-      # Внутри docker-сети сервисы доступны по своим именам: writeservice, readservice.
       - Grpc:WriteService=http://writeservice:8080
       - Grpc:ReadService=http://readservice:8080
 
