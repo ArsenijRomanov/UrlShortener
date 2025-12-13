@@ -91,6 +91,7 @@ services:
     depends_on:
       - writeservice
       - readservice
+    environment:
       - ASPNETCORE_URLS=http://+:8080
       - ASPNETCORE_ENVIRONMENT=Development
       - ShortUrlBase=http://localhost:8080
